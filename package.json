@@ -9,7 +9,8 @@
     "build:bun": "bun scripts/build-bun.js",
     "test": "bun test tests/",
     "test:e2e": "bun scripts/build-bun.js --readable && bun tests/e2e/run.js",
-    "readme-tree": "node lib/tree.js"
+    "readme-tree": "node lib/tree.js",
+    "screenshots": "bun scripts/build-bun.js --readable && README_SHOTS=1 bun tests/e2e/run.js"
   },
   "targets": {
     "userscript": {

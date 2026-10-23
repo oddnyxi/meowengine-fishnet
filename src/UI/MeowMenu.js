@@ -254,7 +254,8 @@ export function createMeowMenu() {
   const comp = ui.addTab('Composer', { group: 'Network', icon: '➤' });
   comp.createLabel('Build and send a FishNet packet to the server. Arguments are hex in FishNet\'s serialisation format (use the Packets tab to copy real ones).');
   const kind = comp.createDropdown(['ServerRpc', 'Broadcast', 'Raw packet bytes'], () => {}, { label: 'Kind', selected: 0, save: false });
-  const [k1, k2, k3] = comp.createColumns(3);
+  const [k1, k2] = comp.createColumns(2);
+  const k3 = comp;
   const cObj = k1.createNumberInput('Object Id', () => {}, { min: 0, max: 65535, value: 0, save: false });
   const cComp = k2.createNumberInput('Component', () => {}, { min: 0, max: 255, value: 0, save: false });
   const cHash = k3.createNumberInput('RPC hash', () => {}, { min: 0, max: 65535, value: 0, save: false });
@@ -353,7 +354,7 @@ export function createMeowMenu() {
 
   ui.selectTab(dash);
   ui.notify('MeowEngine loaded · Insert / V toggles the menu', 'info', 4000);
-  return { ui, log, destroy: () => { timers.forEach(clearInterval); ui.destroy(); blocker.remove(); } };
+  return { ui, log, views: { objList, pktList, playersTable, rpcTable }, destroy: () => { timers.forEach(clearInterval); ui.destroy(); blocker.remove(); } };
 }
 
 /**

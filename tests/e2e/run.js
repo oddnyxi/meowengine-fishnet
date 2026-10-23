@@ -48,6 +48,8 @@ const server = Bun.serve({
       const u8 = new Uint8Array(msg);
       fromClient.push(u8);
       const f = parseFrame(u8, { direction: 'out' });
+      const ping = f.packets.find((p) => p.id === PacketId.PingPong);
+      if (ping) setTimeout(() => { const b = frameIn([Packets.pingPong(ping.tick)])[0]; sentToClient.push(b); ws.send(b); }, 30 + Math.random() * 25);
       if (f.packets.some((p) => p.id === PacketId.ServerRpc)) {
         // reply with a chat-like broadcast so incoming hooks can be exercised
         const b = frameIn([Packets.broadcast(stableHashU16('Game.Chat'), new FishWriter().writeString('pong').toBytes())]);
@@ -90,6 +92,10 @@ setTimeout(() => {
     ws.send(new Uint8Array([1,0,0,0, 21,0, 10, 52,46,55,46,52, 0]).buffer);
   };
   ws.onmessage = (e) => { window.received.push(Array.from(new Uint8Array(e.data))); };
+  if (location.hash === '#ping') {
+    let t = 100;
+    setInterval(() => { t += 7; const b = new Uint8Array([0,0,0,0, 14,0, 0,0,0,0, 0]); new DataView(b.buffer).setUint32(0, t, true); new DataView(b.buffer).setUint32(6, t, true); ws.send(b.buffer); }, 250);
+  }
 }, 300);
 window.sendRpc = (args, channel) => {
   // tick 2, ServerRpc obj 10 spawned comp 1, len = args+1, hash 3, args
@@ -99,14 +105,14 @@ window.sendRpc = (args, channel) => {
 </script></body></html>`;
 
 const browser = await chromium.launch({ args: ['--allow-running-insecure-content', '--disable-features=LocalNetworkAccessChecks,PrivateNetworkAccessChecks,BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessRespectPreflightResults'] });
-const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: process.env.README_SHOTS ? 2 : 1 });
 await ctx.route(GAME + '*', (route) => route.fulfill({ contentType: 'text/html', body: page }));
 await ctx.addInitScript({ content: script });
 const pg = await ctx.newPage();
 const logs = [];
 pg.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));
 pg.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
-await pg.goto(GAME);
+await pg.goto(GAME + (process.env.README_SHOTS ? '#ping' : ''));
 await pg.waitForFunction(() => window.received && window.received.length >= 4, null, { timeout: 10000 }).catch(() => {});
 await pg.waitForTimeout(800);
 if (process.env.VERBOSE) console.log(logs.join('\n'));
@@ -163,14 +169,16 @@ const n1 = await pg.evaluate(() => window.received.length);
 await pg.evaluate(() => window.sendRpc([5], 0));
 await pg.waitForTimeout(300);
 const reply = (await pg.evaluate((n) => window.received.slice(n), n1)).map((r) => parseFrame(Uint8Array.from(r), { direction: 'in' }));
-const bc = reply.length && reply[0].packets.find((p) => p.name === 'Broadcast');
-check(bc && new TextDecoder().decode(bc.data.subarray(1)) === 'hacke' && reply[0].tick === sentToClient[sentToClient.length - 1][0] + (sentToClient[sentToClient.length - 1][1] << 8), 'incoming Broadcast rewritten by hook before the game saw it (tick preserved)');
+const bcFrame = reply.find((f) => f.packets.some((p) => p.name === 'Broadcast'));
+const bc = bcFrame && bcFrame.packets.find((p) => p.name === 'Broadcast');
+const sentTicks = new Set(sentToClient.map((b) => new DataView(b.buffer, b.byteOffset).getUint32(0, true)));
+check(bc && new TextDecoder().decode(bc.data.subarray(1)) === 'hacke' && sentTicks.has(bcFrame.tick), 'incoming Broadcast rewritten by hook before the game saw it (tick preserved)');
 
 // Bayou keep-alive passes untouched
 const k0 = fromClient.length;
 await pg.evaluate(() => window.gameSocket.send(new Uint8Array([14, 1, 2, 3, 4]).buffer));
 await pg.waitForTimeout(200);
-check(fromClient.length === k0 + 1 && hex(fromClient[k0]) === '0e01020304', 'Bayou keep-alive forwarded untouched');
+check(fromClient.slice(k0).some((b) => hex(b) === '0e01020304'), 'Bayou keep-alive forwarded untouched');
 
 // 5. split message was reassembled for inspection
 const splitSeen = await pg.evaluate(() => MeowEngine.FishNet.FishNetSocketManager.capture.some((e) => e.packet.name === 'TargetRpc' && e.packet.args.length === 3000));
@@ -180,12 +188,38 @@ check(splitSeen, 'split TargetRpc (3000 bytes) reassembled in the inspector');
 const unrel = await pg.evaluate(() => MeowEngine.FishNet.FishNetSocketManager.capture.find((e) => e.packet.name === 'ObserversRpc'));
 check(unrel && unrel.channel === 1 && unrel.packet.hash === 6, 'unreliable ObserversRpc decoded');
 
-// 7. UI renders (screenshots of a few tabs)
-const tabs = ['Dashboard', 'Players', 'Packets', 'RPC Explorer', 'Objects', 'FishNet'];
+// 7. UI renders (screenshots of each tab, clipped to the menu window)
+// README_SHOTS=1 writes 2x images to docs/images for the README.
+const shotDir = process.env.README_SHOTS ? resolve(root, 'docs/images') : outDir;
+mkdirSync(shotDir, { recursive: true });
+await pg.evaluate(() => {
+  const st = MeowEngine.FishNet.FishNetSocketManager.state;
+  const link = [...st.rpcStats.values()].find((r) => r.looksLikeNetworkTransform);
+  if (link) st.nameRpc(link.key, 'NetworkTransform update');
+  st.registerBroadcast('Game.Chat', 'ChatBroadcast');
+  const ui = MeowEngine.Menu.ui;
+  ui.win.style.width = '820px';
+  ui.win.style.height = '600px';
+  ui.win.style.left = '230px';
+  ui.win.style.top = '100px';
+});
+if (process.env.README_SHOTS) await pg.waitForTimeout(6000);
+const tabs = ['Dashboard', 'Players', 'Objects', 'Packets', 'RPC Explorer', 'Composer', 'Console', 'FishNet'];
 for (const t of tabs) {
   await pg.evaluate((name) => { const ui = MeowEngine.Menu.ui; ui.selectTab(ui.tabs.find((x) => x.name === name)); }, t);
-  await pg.waitForTimeout(1200);
-  await pg.screenshot({ path: `${outDir}/tab-${t.replace(/\s/g, '_')}.png` });
+  await pg.waitForTimeout(1300);
+  if (t === 'Objects') await pg.evaluate(() => MeowEngine.Menu.views.objList.setValue(11));
+  if (t === 'Packets') {
+    await pg.evaluate(() => {
+      const cap = MeowEngine.FishNet.FishNetSocketManager.capture;
+      const e = cap.find((x) => x.packet.name === 'ObjectSpawn');
+      MeowEngine.Menu.views.pktList.setValue(e.seq);
+    });
+  }
+  await pg.waitForTimeout(300);
+  const box = await pg.evaluate(() => { const r = MeowEngine.Menu.ui.win.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; });
+  const pad = 24;
+  await pg.screenshot({ path: `${shotDir}/${t.toLowerCase().replace(/\s/g, '-')}.png`, clip: { x: box.x - pad, y: box.y - pad, width: box.width + pad * 2, height: box.height + pad * 2 } });
 }
 const uiOk = await pg.evaluate(() => !!document.getElementById('odium-ui-host') && MeowEngine.Menu.ui.tabs.length);
 check(uiOk >= 8, `Odium window mounted with ${uiOk} tabs`);
