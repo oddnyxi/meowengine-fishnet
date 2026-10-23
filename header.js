@@ -16,7 +16,7 @@
 /*
  * MeowEngine v2.0 - Proprietary Software License
  *
- * Copyright (c) 2025 Snoofz
+ * Copyright (c) 2025 Nyxi
  *
  * THIS IS PROPRIETARY SOFTWARE AND NOT OPEN SOURCE
  *
