@@ -12,12 +12,12 @@ export function addSettingsTab(name = 'Settings', o = {}) {
     min: 30, max: 100, value: Math.round(this._opacity * 100), suffix: '%', save: false,
   });
   t.createTextInput('Window Icon URL', () => {}, {
-    placeholder: 'png url, press Enter (empty = reset)',
+    placeholder: 'png url, press Enter (empty = none)',
     value: this._icon || '',
     save: false,
     onEnter: (v) => {
       this.setWindowIcon(v.trim() || null);
-      this.notify(v.trim() ? 'Window icon set' : 'Window icon reset', 'info');
+      this.notify(v.trim() ? 'Window icon set' : 'Window icon removed', 'info');
     },
   });
 

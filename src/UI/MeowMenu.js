@@ -1,4 +1,5 @@
 import { UI } from '../OdiumUI/core/UI.js';
+import { Icons } from './icons.js';
 import MeowEngine from '../Browser/GlobalTypeDefs';
 import { FishNetSocketManager, FishNetConfig, activeProfile } from '../FishNet/FishNetSocketManager.js';
 import { FishNetClientInstance } from '../FishNet/FishNetClient.js';
@@ -39,14 +40,14 @@ export function createMeowMenu() {
   const m = FishNetSocketManager;
   const st = m.state;
   const ui = new UI();
-  ui.createWindow('MEOWENGINE', { subtitle: 'v2.0 · FishNet', width: 740, height: 540, toggleKey: 'Insert', icon: 'M' });
+  ui.createWindow('MEOWENGINE', { subtitle: 'v2.0 · FishNet', width: 740, height: 540, toggleKey: 'Insert', icon: null });
   ui.bindKey('V', () => ui.toggle());
 
   const timers = [];
   const every = (ms, fn) => timers.push(setInterval(() => { try { fn(); } catch (e) { console.warn('[MeowEngine UI]', e); } }, ms));
 
   // ======================================================== Dashboard
-  const dash = ui.addTab('Dashboard', { group: 'General', icon: '◆' });
+  const dash = ui.addTab('Dashboard', { group: 'General', icon: Icons.dashboard });
   dash.createSection('Connection');
   const badge = dash.createBadge('Waiting for FishNet connection', 'gray');
   const [c1, c2] = dash.createColumns(2);
@@ -94,7 +95,7 @@ export function createMeowMenu() {
   });
 
   // ======================================================== Players
-  const players = ui.addTab('Players', { group: 'General', icon: '◉' });
+  const players = ui.addTab('Players', { group: 'General', icon: Icons.players });
   players.createLabel('Players are the owning connections of spawned NetworkObjects. Positions come from NetworkTransform updates when the game uses it.');
   const playersTable = players.createTable(['Client', '', 'Objects', 'Prefabs', 'Position', 'Updated'], [], {
     height: 360,
@@ -114,7 +115,7 @@ export function createMeowMenu() {
   });
 
   // ======================================================== Objects
-  const objects = ui.addTab('Objects', { group: 'Network', icon: '▣' });
+  const objects = ui.addTab('Objects', { group: 'Network', icon: Icons.objects });
   let objFilter = '';
   const objList = objects.createListBox('Spawned NetworkObjects', [], (v) => showObject(v), { height: 190, search: true, save: false });
   const objCode = objects.createCodeBlock('Select an object.', { title: 'Details' });
@@ -142,7 +143,7 @@ export function createMeowMenu() {
   });
 
   // ======================================================== Packets
-  const packets = ui.addTab('Packets', { group: 'Network', icon: '⇅' });
+  const packets = ui.addTab('Packets', { group: 'Network', icon: Icons.packets });
   const [p1, p2] = packets.createColumns(2);
   p1.createToggle('Capture traffic', (v) => { FishNetConfig.capture = v; }, FishNetConfig.capture, { save: false });
   const pause = p2.createToggle('Freeze list', () => {}, false, { save: false });
@@ -189,7 +190,8 @@ export function createMeowMenu() {
       if (types.size && !types.has(n)) continue;
       if (!types.size && hideNoise.getValue() && NOISE.has(n)) continue;
       items.push({
-        text: `${e.direction === 'in' ? '◀' : '▶'} ${n}${e.flag ? ` [${e.flag}]` : ''}`,
+        text: `${n}${e.flag ? ` [${e.flag}]` : ''}`,
+        icon: e.direction === 'in' ? Icons.incoming : Icons.outgoing,
         hint: `${describePacket(e.packet)}`.slice(0, 90),
         value: e.seq,
       });
@@ -202,7 +204,7 @@ export function createMeowMenu() {
   every(500, () => refreshPackets(false));
 
   // ======================================================== RPC explorer
-  const rpcTab = ui.addTab('RPC Explorer', { group: 'Network', icon: '#' });
+  const rpcTab = ui.addTab('RPC Explorer', { group: 'Network', icon: Icons.explorer });
   rpcTab.createLabel('Every RPC / RpcLink / SyncType / Broadcast seen, grouped by object prefab + component + hash. Click a row to name it; names are saved and shown in the packet list.');
   const rpcTable = rpcTab.createTable(['Dir', 'Kind', 'Target', 'Hash', 'Count', 'Last', 'Name'], [], {
     height: 300,
@@ -226,7 +228,7 @@ export function createMeowMenu() {
         ? `key 0x${r.broadcastKey.toString(16).padStart(4, '0')}`
         : `${o ? (o.prefabId != null ? `prefab ${o.prefabId}` : 'scene') : `obj ${r.objectId}`} c${r.componentIndex ?? '?'}`;
       const name = r.kind === 'Broadcast' ? st.broadcastName(r.broadcastKey) : st.registry.rpcs[r.key];
-      const row = [r.direction === 'in' ? '◀' : '▶', r.kind + (r.looksLikeNetworkTransform ? ' (NT)' : ''), target, r.hash ?? '', String(r.count), `${r.lastSize}b`, name || ''];
+      const row = [r.direction === 'in' ? 'In' : 'Out', r.kind + (r.looksLikeNetworkTransform ? ' (NT)' : ''), target, r.hash ?? '', String(r.count), `${r.lastSize}b`, name || ''];
       row.__i = i;
       return row;
     }));
@@ -251,7 +253,7 @@ export function createMeowMenu() {
   });
 
   // ======================================================== Composer
-  const comp = ui.addTab('Composer', { group: 'Network', icon: '➤' });
+  const comp = ui.addTab('Composer', { group: 'Network', icon: Icons.composer });
   comp.createLabel('Build and send a FishNet packet to the server. Arguments are hex in FishNet\'s serialisation format (use the Packets tab to copy real ones).');
   const kind = comp.createDropdown(['ServerRpc', 'Broadcast', 'Raw packet bytes'], () => {}, { label: 'Kind', selected: 0, save: false });
   const [k1, k2] = comp.createColumns(2);
@@ -290,7 +292,7 @@ export function createMeowMenu() {
   });
 
   // ======================================================== Console
-  const consoleTab = ui.addTab('Console', { group: 'System', icon: '›' });
+  const consoleTab = ui.addTab('Console', { group: 'System', icon: Icons.console });
   const log = consoleTab.createLog('MeowEngine', { max: 400, height: 380 });
   const hookLogger = () => {
     const L = MeowEngine.Log.Instance;
@@ -313,7 +315,7 @@ export function createMeowMenu() {
   m.addListener('packet:Disconnect', () => log.log('Server sent Disconnect (kick)', 'error'));
 
   // ======================================================== Settings
-  const set = ui.addTab('FishNet', { group: 'System', icon: '⚙' });
+  const set = ui.addTab('FishNet', { group: 'System', icon: Icons.sliders });
   set.createSection('Protocol');
   set.createLabel('Wire format is picked from the FishNet version the game announces (4.4.3 – 4.7.x supported) over the Bayou WebGL transport. Change these only if decoding shows errors.');
   set.createTextInput('Assume FishNet version', (v) => { FishNetConfig.assumeVersion = v.trim(); }, { placeholder: 'blank = from handshake, e.g. 4.6.5', value: FishNetConfig.assumeVersion, id: 'fn/assume' });
@@ -337,7 +339,7 @@ export function createMeowMenu() {
   const blockToggle = set.createToggle('Block game input while menu is open', (v) => blocker.setEnabled(v), true, { id: 'menu/block' });
   set.createButton('Reset FishNet state', () => { st.reset(); ui.notify('State cleared', 'info'); });
 
-  ui.addSettingsTab('Interface', { group: 'System' });
+  ui.addSettingsTab('Interface', { group: 'System', icon: Icons.monitor });
 
   // keep the input blocker in sync with window visibility
   const show = ui.show.bind(ui);
@@ -348,6 +350,7 @@ export function createMeowMenu() {
   blocker.setActive(true);
 
   ui.loadConfig('meowengine');
+  if (ui._icon === 'M') ui.setWindowIcon(null); // logo used by an earlier build
   ui.saveConfig = ((orig) => (name = 'meowengine') => orig.call(ui, name))(ui.saveConfig);
   ui.loadConfig = ((orig) => (name = 'meowengine') => orig.call(ui, name))(ui.loadConfig);
   window.addEventListener('beforeunload', () => ui.saveConfig());

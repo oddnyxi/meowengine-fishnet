@@ -33,8 +33,8 @@ export function createWindow(title = 'ODIUM', o = {}) {
       <div class="logo">O</div>
       <span class="title">${esc(title)}</span><span class="sub">${esc(subtitle)}</span>
       <span class="spacer"></span>
-      <button class="wbtn m" title="Minimize">–</button>
-      <button class="wbtn x" title="Hide">✕</button>
+      <button class="wbtn m" title="Minimize"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+      <button class="wbtn x" title="Hide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
     </div>
     <div class="body"><div class="side"></div><div class="content"></div></div>
     <div class="foot"><span>Odium UI</span><span>Toggle: <b class="tk"></b></span></div>

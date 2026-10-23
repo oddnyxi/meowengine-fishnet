@@ -409,6 +409,7 @@ These are the modifications to the original MeowEngine Parcel, as required by th
 
 - Replaced the placeholder FishNet layer (it sent invented JSON messages and never parsed real traffic) with a binary implementation of the FishNet 4.x protocol: codec, framing, version profiles, state mirror, hooks and client API.
 - Replaced the `src/Menu` UI (UIManager, components and canvas overlays) with Odium UI and a new menu in `src/UI/MeowMenu.js`.
+- Odium UI (vendored in `src/OdiumUI`) gained inline SVG icon support, SVG window buttons and an optional, hidden-by-default window logo; the menu uses a consistent line-icon set (`src/UI/icons.js`).
 - The WebSocket hook is now installed at startup instead of after Unity loads, and the wait for Unity now allows up to 5 minutes instead of 10 seconds.
 - Added the protocol documentation, unit and end-to-end tests, a Bun build script and the README screenshots.
 - `HttpRequestManager` now clears the FishNet player list instead of the removed Photon overlay.

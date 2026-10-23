@@ -1,13 +1,14 @@
 .side {
-  width: 148px; padding: 10px; display: flex; flex-direction: column; gap: 4px;
+  width: 168px; padding: 10px; display: flex; flex-direction: column; gap: 4px;
   background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; flex: none;
 }
 .sgroup { padding: 10px 12px 4px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #5d5d68; font-weight: 700; }
-.tab {
+.tab { white-space: nowrap;
   position: relative; display: flex; align-items: center; text-align: left; padding: 9px 12px; border: 0; border-radius: 8px;
   background: transparent; color: var(--mute); font: inherit; font-weight: 500; cursor: pointer; transition: .15s;
 }
-.tab .ic { margin-right: 8px; opacity: .85; }
+.tab .ic { margin-right: 9px; opacity: .8; }
+.tab.on .ic, .tab:hover .ic { opacity: 1; }
 .tab:hover { background: var(--hover); color: var(--text); }
 .tab.on { background: var(--red-dim); color: #fff; }
 .tab.on::before {

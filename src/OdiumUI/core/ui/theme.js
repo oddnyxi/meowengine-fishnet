@@ -30,20 +30,22 @@ export function setOpacity(v) {
   return this;
 }
 
-/** icon: image URL, or a short glyph/emoji. Falsy resets to the default "O". */
+/** icon: image URL, inline <svg>, or a short glyph. Falsy hides the logo. */
 export function setWindowIcon(icon) {
   this._icon = icon || null;
   const lg = this.win && this.win.querySelector('.logo');
   if (!lg) return this;
   lg.innerHTML = '';
   lg.classList.remove('img');
+  lg.classList.toggle('none', !this._icon);
+  if (!this._icon) return this;
   if (this._icon && isUrl(this._icon)) {
     const im = makeIcon(this._icon, 'logo-img');
     im.addEventListener('error', () => { if (this._icon === icon) this.setWindowIcon(null); });
     lg.classList.add('img');
     lg.appendChild(im);
   } else {
-    lg.textContent = this._icon || 'O';
+    lg.textContent = this._icon;
   }
   return this;
 }
