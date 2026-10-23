@@ -36,13 +36,13 @@ export function setWindowIcon(icon) {
   const lg = this.win && this.win.querySelector('.logo');
   if (!lg) return this;
   lg.innerHTML = '';
-  lg.classList.remove('img');
+  lg.classList.remove('has-img');
   lg.classList.toggle('none', !this._icon);
   if (!this._icon) return this;
   if (this._icon && isUrl(this._icon)) {
     const im = makeIcon(this._icon, 'logo-img');
     im.addEventListener('error', () => { if (this._icon === icon) this.setWindowIcon(null); });
-    lg.classList.add('img');
+    lg.classList.add('has-img');
     lg.appendChild(im);
   } else {
     lg.textContent = this._icon;

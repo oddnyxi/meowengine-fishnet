@@ -1,5 +1,6 @@
 import { UI } from '../OdiumUI/core/UI.js';
 import { Icons } from './icons.js';
+import { LOGO } from './logo.js';
 import MeowEngine from '../Browser/GlobalTypeDefs';
 import { FishNetSocketManager, FishNetConfig, activeProfile } from '../FishNet/FishNetSocketManager.js';
 import { FishNetClientInstance } from '../FishNet/FishNetClient.js';
@@ -40,7 +41,15 @@ export function createMeowMenu() {
   const m = FishNetSocketManager;
   const st = m.state;
   const ui = new UI();
+  // The MeowEngine logo is the default window icon; a custom one can be set under Interface.
+  const setWindowIcon = ui.setWindowIcon.bind(ui);
+  ui.setWindowIcon = (icon) => {
+    setWindowIcon(icon || LOGO);
+    if (!icon) ui._icon = null; // keep the default out of saved configs
+    return ui;
+  };
   ui.createWindow('MEOWENGINE', { subtitle: 'v2.0 · FishNet', width: 740, height: 540, toggleKey: 'Insert', icon: null });
+  ui.setWindowIcon(null);
   ui.bindKey('V', () => ui.toggle());
 
   const timers = [];
@@ -350,7 +359,7 @@ export function createMeowMenu() {
   blocker.setActive(true);
 
   ui.loadConfig('meowengine');
-  if (ui._icon === 'M') ui.setWindowIcon(null); // logo used by an earlier build
+  if (ui._icon === 'M') ui.setWindowIcon(null); // placeholder logo saved by an earlier build
   ui.saveConfig = ((orig) => (name = 'meowengine') => orig.call(ui, name))(ui.saveConfig);
   ui.loadConfig = ((orig) => (name = 'meowengine') => orig.call(ui, name))(ui.loadConfig);
   window.addEventListener('beforeunload', () => ui.saveConfig());

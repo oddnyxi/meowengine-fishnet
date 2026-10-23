@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/images/icon.png" alt="MeowEngine logo" width="120">
+
 # MeowEngine Parcel
 
 **A Bullet Force mod base with a FishNet 4.x protocol SDK and an Odium UI menu, bundled into a single userscript.**
@@ -336,13 +338,16 @@ meowengine-parcel/
 │   ├── Browser/                     # globals, logging, Unity helpers
 │   ├── Bullet Force/                # game web API helpers
 │   └── Photon/ Patches/ MeowEngine/ # legacy Photon code, kept for reference
+├── assets/icon.png                  # app icon (source for all icon sizes)
 ├── docs/
 │   ├── FISHNET_PROTOCOL.md          # protocol write-up
-│   └── images/                      # README screenshots
+│   └── images/                      # README screenshots and logo
 ├── tests/
 │   ├── fishnet.test.js              # codec unit tests
 │   └── e2e/run.js                   # fake server + headless Chromium
-├── scripts/build-bun.js             # dependency-free build
+├── scripts/
+│   ├── build-bun.js                 # dependency-free build
+│   └── make-icons.py                # regenerates icon sizes from assets/icon.png
 ├── header.js                        # userscript metadata block
 └── bundle.js                        # prepends the header after a Parcel build
 ```
@@ -357,6 +362,7 @@ meowengine-parcel/
 | `pnpm test` | Codec unit tests (Bun) |
 | `pnpm test:e2e` | Builds, then runs the userscript in headless Chromium against a fake FishNet server |
 | `pnpm screenshots` | Regenerates `docs/images/*.png` |
+| `python3 scripts/make-icons.py` | Regenerates the userscript icon, window logo and README logo from `assets/icon.png` |
 | `pnpm readme-tree` | Prints the source tree (the legacy README generator) |
 
 The end-to-end test uses Bun and Playwright with the Chromium build installed alongside Playwright. It checks:
@@ -405,23 +411,24 @@ They aren't part of FishNet. They live in Bullet Force's own RPCs and SyncTypes.
 
 ## Changes in This Version
 
-These are the modifications to the original MeowEngine Parcel, as required by the license:
+The following changes were made to the original MeowEngine Parcel:
 
 - Replaced the placeholder FishNet layer (it sent invented JSON messages and never parsed real traffic) with a binary implementation of the FishNet 4.x protocol: codec, framing, version profiles, state mirror, hooks and client API.
 - Replaced the `src/Menu` UI (UIManager, components and canvas overlays) with Odium UI and a new menu in `src/UI/MeowMenu.js`.
 - Odium UI (vendored in `src/OdiumUI`) gained inline SVG icon support, SVG window buttons and an optional, hidden-by-default window logo; the menu uses a consistent line-icon set (`src/UI/icons.js`).
 - The WebSocket hook is now installed at startup instead of after Unity loads, and the wait for Unity now allows up to 5 minutes instead of 10 seconds.
+- Added the MeowEngine logo as the userscript icon, window icon and README logo.
 - Added the protocol documentation, unit and end-to-end tests, a Bun build script and the README screenshots.
 - `HttpRequestManager` now clears the FishNet player list instead of the removed Photon overlay.
 - `pnpm build` no longer regenerates this README; `lib/tree.js` is available as `pnpm readme-tree`.
 
 ## Credits
 
-- **MeowEngine.** Original author: Subway. © 2025 Nyxi. See [LICENSE](LICENSE.md).
+- **MeowEngine** by **Nyxi**. © 2025-2026 Nyxi. See [LICENSE](LICENSE.md).
 - **[FishNet](https://github.com/FirstGearGames/FishNet)** by FirstGearGames. The protocol implementation follows its sources.
 - **[Bayou](https://github.com/FirstGearGames/Bayou)**: FishNet's WebGL WebSocket transport.
 - **Odium UI**: the in-page UI toolkit used for the menu.
 
 ## License
 
-MIT License with attribution requirements. See [LICENSE.md](LICENSE.md). Modified versions must credit the original author and state what changed.
+MIT License with attribution requirements. See [LICENSE.md](LICENSE.md). Modified versions must credit Nyxi and state what changed. Third-party components keep their own licenses (see the notices at the end of the license).
