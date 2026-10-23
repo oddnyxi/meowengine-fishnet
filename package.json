@@ -1,0 +1,52 @@
+{
+  "name": "meowengine-parcel",
+  "version": "1.0.0",
+  "description": "MeowEngine rewritten with Parcel: FishNet 4.x protocol SDK + Odium UI",
+  "type": "module",
+  "scripts": {
+    "build": "parcel build src/index.js --target userscript --no-source-maps --no-scope-hoist --no-content-hash --detailed-report && node bundle.js",
+    "dev": "parcel watch src/index.js --target userscript --no-source-maps --no-scope-hoist --no-content-hash",
+    "build:bun": "bun scripts/build-bun.js",
+    "test": "bun test tests/",
+    "test:e2e": "bun scripts/build-bun.js --readable && bun tests/e2e/run.js",
+    "readme-tree": "node lib/tree.js"
+  },
+  "targets": {
+    "userscript": {
+      "includeNodeModules": true,
+      "outputFormat": "global",
+      "isLibrary": false,
+      "sourceMap": false,
+      "distDir": "./dist",
+      "publicUrl": "./"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyberarchives/meowengine-parcel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cyberarchives/meowengine-parcel/issues"
+  },
+  "homepage": "https://github.com/cyberarchives/meowengine-parcel#readme",
+  "devDependencies": {
+    "@parcel/config-default": "^2.15.1",
+    "@parcel/optimizer-terser": "^2.15.1",
+    "@parcel/packager-js": "^2.15.1",
+    "parcel": "^2.15.1",
+    "@parcel/transformer-inline-string": "^2.15.1"
+  },
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "native-buffer-browserify": "^3.2.2"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Edge versions",
+    "last 2 Safari versions"
+  ]
+}
