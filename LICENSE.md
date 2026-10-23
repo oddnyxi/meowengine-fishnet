@@ -1,6 +1,6 @@
-MIT License with Attribution Requirements
+# MIT License with Attribution Requirements
 
-Copyright (c) 2025 Nyxi
+Copyright (c) 2025-2026 Nyxi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -9,17 +9,17 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-1. The above copyright notice and this permission notice shall be included in all
-   copies or substantial portions of the Software.
+1. The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
 
-2. Any modifications, derivative works, or adaptations of this Software must
-   include clear attribution to the original author (Subway) in the following forms:
-   a) In the source code comments or README file
-   b) In any user-facing documentation or about sections
-   c) In any public distribution or release notes
+2. Any modification, derivative work or adaptation of the Software must give
+   clear credit to the original author, **Nyxi**, in all of the following:
+   1. the source code comments or the README file;
+   2. any user-facing documentation or "about" section;
+   3. any public distribution, release page or release notes.
 
-3. Modified versions must clearly indicate what changes were made and cannot
-   misrepresent the origin of the Software.
+3. Modified versions must clearly state what was changed and must not
+   misrepresent the origin of the Software or imply endorsement by Nyxi.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,3 +28,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## Third-party notices
+
+This license covers MeowEngine's own code. The following are the work of their
+respective authors and keep their own terms:
+
+- **FishNet** (FirstGearGames): `src/FishNet/Protocol` follows FishNet's wire
+  format and serialization logic. See https://github.com/FirstGearGames/FishNet.
+- **Bayou** (FirstGearGames): the WebGL transport whose framing is implemented
+  in `src/FishNet/Protocol/Framing.js`. See https://github.com/FirstGearGames/Bayou.
+- **Odium UI**: vendored in `src/OdiumUI`.
